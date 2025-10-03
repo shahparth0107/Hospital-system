@@ -15,6 +15,7 @@ router.post('/', auth(), permit('RECEPTION', 'ADMIN'), async (req, res, next) =>
       name, phone, age, gender, address,
       createdBy: req.user._id
     });
+    
     res.status(201).json(patient);
   } catch (err) { next(err); }
 });

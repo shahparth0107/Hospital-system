@@ -6,6 +6,11 @@ const { permit } = require('../middleware/permit');
 
 
 
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+
 // Create staff user (ADMIN only)
 router.post('/', auth(), permit('ADMIN'), async (req, res, next) => {
   try {
@@ -14,6 +19,18 @@ router.post('/', auth(), permit('ADMIN'), async (req, res, next) => {
       return res.status(400).json({ message: 'name, email, password, role required' });
     }
     if (!ROLES.includes(role)) return res.status(400).json({ message: 'Invalid role' });
+
+        if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
+
+    // Password validation
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        message: "Password must be at least 8 characters, with 1 uppercase, 1 lowercase, and 1 number",
+      });
+    }
+
 
     const existing = await User.findOne({ email: email.toLowerCase().trim() });
     if (existing) return res.status(409).json({ message: 'Email already exists' });
